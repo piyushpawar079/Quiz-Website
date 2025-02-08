@@ -93,4 +93,4 @@ This is an interactive quiz application built using React, Redux, and Framer Mot
 
 ## Demo Video
 
-![](https://github.com/user-attachments/assets/892dbf9f-154b-4d54-9ca2-4d1b972c2a47)
+https://github.com/user-attachments/assets/892dbf9f-154b-4d54-9ca2-4d1b972c2a47
