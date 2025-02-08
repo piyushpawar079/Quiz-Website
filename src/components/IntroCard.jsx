@@ -84,7 +84,7 @@ const IntroCard = () => {
           <motion.div
             animate={{ scale: 1, x: [0, -10, 0], y: [0, -10, 10, 0] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute -left-12 bottom-8 w-32 h-10 border-l-[10px] border-b-[10px] border-pink-400 rounded-bl-full rotate-[-20deg]"
+            className="absolute -left-12 bottom-8 w-42 h-10 border-l-[10px] border-b-[10px] border-pink-400 rounded-bl-full rotate-[-10deg]"
           />
 
           <motion.button
