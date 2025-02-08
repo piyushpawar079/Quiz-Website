@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchQuestions, submitAnswer, nextQuestion } from "../store/QuizSlice.js";
+import { submitAnswer, nextQuestion } from "../store/QuizSlice.js";
 import Confetti from "react-confetti";
+import { useNavigate } from "react-router-dom";
 
 const QuizQuestion = () => {
   const dispatch = useDispatch();
   const { questions, currentQuestionIndex, loading, score } = useSelector(
     (state) => state.quiz
   );
+
+  const nav = useNavigate();
 
   const [selected, setSelected] = useState(null);
   const [showCelebration, setShowCelebration] = useState(false);
@@ -52,8 +55,12 @@ const QuizQuestion = () => {
     return <div className="flex items-center justify-center min-h-screen bg-sky-200 text-2xl">No questions available</div>;
   }
 
+  if(currentQuestionIndex >= questions.length){
+    nav('/results');
+    return;
+  }
+
   const currentQuestion = questions[currentQuestionIndex];
-  console.log(currentQuestion.content)
 
   const handleSubmit = () => {
     if (selected !== null && !isSubmitted) {

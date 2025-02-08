@@ -26,7 +26,7 @@ const quizSlice = createSlice({
   initialState: {
     questions: [],
     currentQuestionIndex: 0,
-    currentCorrectAnswer: '',
+    userAnswers: [],
     isCorrect: null,
     score: 0,
     loading: false,
@@ -35,7 +35,7 @@ const quizSlice = createSlice({
   reducers: {
     submitAnswer: (state, action) => {
       const { selectedAnswer } = action.payload;     
-
+      state.userAnswers[state.currentQuestionIndex] = selectedAnswer;
       if (selectedAnswer.is_correct) {
         state.score += 4;
         state.isCorrect = true

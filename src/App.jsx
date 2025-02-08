@@ -1,19 +1,17 @@
-import { useState, useEffect } from "react";
-import { QuizQuestion, IntroCard } from "./components";
-import  store  from "./store/store.js";
-import { Provider } from 'react-redux';
-
+import { QuizQuestion, IntroCard, QuizResults } from "./components";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 function App() {
-  const [start, setStart] = useState(false);
   
   return (
-    <Provider store={store}>
-      {!start ? <IntroCard startQuiz={() => setStart(true)} /> : <QuizQuestion />}
-    </Provider>
-    // <Provider store={store}>
-    //   <QuizGame />
-    // </Provider>
+    <Router>
+      <Routes>
+      <Route path="/" element={<IntroCard />} />
+      <Route path="/quiz" element={<QuizQuestion />} />
+      <Route path="/results" element={<QuizResults />} />
+      </Routes>
+    </Router>
+    
   );
 }
 

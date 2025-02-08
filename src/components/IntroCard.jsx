@@ -2,10 +2,12 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
 import {fetchQuestions} from '../store/QuizSlice.js'
+import { useNavigate } from 'react-router-dom';
 
-const IntroCard = ({ startQuiz }) => {
+const IntroCard = () => {
   // Animation variants for floating effect
   const dispatch = useDispatch();
+  const nav = useNavigate();
 
   useEffect(() => {
     dispatch(fetchQuestions());
@@ -32,6 +34,11 @@ const IntroCard = ({ startQuiz }) => {
       }
     }
   };
+
+  const handleStartQuiz = () => {
+    nav('/quiz');
+    return;
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-sky-200 p-4">
@@ -95,16 +102,16 @@ const IntroCard = ({ startQuiz }) => {
           />
 
           {/* Arrow button */}
-          <motion.div
+          <motion.button
             // initial={{ scale: 0 }}
             animate={{ scale: 1, ...floatingAnimation.animate }}
             whileHover={{ scale: 1.2 }}
             whileTap={{ scale: 0.9 }}
             className="absolute -right-6 bottom-8 w-12 h-12 bg-pink-400 rounded-full flex items-center justify-center cursor-pointer"
-            onClick={startQuiz}
+            onClick={handleStartQuiz}
           >
             <span className="text-white font-bold text-xl">→</span>
-          </motion.div>
+          </motion.button>
         </motion.div>
       </div>
     </div>
