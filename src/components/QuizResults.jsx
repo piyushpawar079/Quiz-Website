@@ -1,10 +1,12 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
+import { resetQuiz } from "../store/QuizSlice";
 
 const QuizResults = () => {
   const { questions, userAnswers, score } = useSelector((state) => state.quiz);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [openDetails, setOpenDetails] = useState({});
   const [expandedSections, setExpandedSections] = useState({});
@@ -113,14 +115,17 @@ const QuizResults = () => {
       </div>
 
       {/* Navigation Buttons */}
-      <div className="mt-6 flex gap-4">
+        <div className="mt-6 flex gap-4">
         <button
-          className="px-6 py-2 bg-indigo-500 text-white rounded-lg shadow-md hover:bg-indigo-600"
-          onClick={() => navigate("/")}
+            className="px-6 py-2 bg-indigo-500 text-white rounded-lg shadow-md hover:bg-indigo-600"
+            onClick={() => {
+            dispatch(resetQuiz()) // Clear local storage
+            navigate("/"); // Navigate to home
+            }}
         >
-          Home
+            Home
         </button>
-      </div>
+        </div>
     </div>
   );
 };

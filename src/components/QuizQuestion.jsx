@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { submitAnswer, nextQuestion } from "../store/QuizSlice.js";
 import Confetti from "react-confetti";
 import { useNavigate } from "react-router-dom";
+import { GiConsoleController } from "react-icons/gi";
 
 const QuizQuestion = () => {
   const dispatch = useDispatch();
@@ -18,7 +19,6 @@ const QuizQuestion = () => {
   const [confettiPieces, setConfettiPieces] = useState(150);
   const [isCorrect, setIsCorrect] = useState(null);
   const [showSolution, setShowSolution] = useState(false);
-  const [showMaterial, setShowMaterial] = useState(false);
   const [backgroundGlow, setBackgroundGlow] = useState(false);
   const [cardShake, setCardShake] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -55,33 +55,67 @@ const QuizQuestion = () => {
     return <div className="flex items-center justify-center min-h-screen bg-sky-200 text-2xl">No questions available</div>;
   }
 
-  if(currentQuestionIndex >= questions.length){
+  if (currentQuestionIndex >= questions.length) {
     nav('/results');
     return;
   }
+  
 
   const currentQuestion = questions[currentQuestionIndex];
 
+  useEffect(() => {
+    const storedData = localStorage.getItem(`submitted-${currentQuestionIndex}`);
+  
+    if (storedData) {
+      try {
+        const parsedData = JSON.parse(storedData);
+        if (parsedData) {
+          console.log("parsedData", parsedData)
+          setSelected(currentQuestion.options[parsedData.selectedIndex]);
+          setIsSubmitted(parsedData.submitted);
+          setCorrectAnswer(parsedData.correctAnswer);
+          setIsCorrect(currentQuestion.options[parsedData.selectedIndex]?.is_correct || false);
+        }
+      } catch (error) {
+        console.error("Error parsing stored submission:", error);
+      }
+    } else {
+      // Reset state if there's no stored submission
+      setSelected(null);
+      setIsSubmitted(false);
+      setCorrectAnswer(null);
+      setIsCorrect(null);
+    }
+  }, [currentQuestionIndex, questions]);   
+  
   const handleSubmit = () => {
     if (selected !== null && !isSubmitted) {
       const isAnswerCorrect = selected.is_correct;
       dispatch(submitAnswer({ selectedAnswer: selected }));
-
+  
       setIsCorrect(isAnswerCorrect);
       setIsSubmitted(true);
       setBackgroundGlow(true);
-
+  
       if (isAnswerCorrect) {
         setShowCelebration(true);
       } else {
         setCardShake(true);
       }
-
-      // Find and store the correct answer
+  
       const correctOpt = currentQuestion.options.find((opt) => opt.is_correct);
       setCorrectAnswer(correctOpt);
+  
+      // Store submission in localStorage
+      const selectedIndex = currentQuestion.options.findIndex(opt => opt.description === selected.description);
+      localStorage.setItem(
+        `submitted-${currentQuestionIndex}`,
+        JSON.stringify({ selectedIndex, submitted: true, correctAnswer: correctOpt })
+      );
     }
   };
+  
+  console.log(selected, correctAnswer, isSubmitted)
 
   const handleNextQuestion = () => {
     setIsCorrect(null);
@@ -92,24 +126,17 @@ const QuizQuestion = () => {
     setCardShake(false);
     setIsSubmitted(false);
     setCorrectAnswer(null);
-    setShowMaterial(false)
     dispatch(nextQuestion());
   };
 
   const handleViewSolution = () => {
-    setShowSolution((prev) => (prev = !prev));
-    setShowMaterial(false)
+    setShowSolution((prev) => !prev);
   };
 
   const cleanText = (text) => text.replace(/\*/g, ''); 
 
-  // const handleViewMaterial = () => {
-  //   setShowMaterial(true)
-  //   setShowSolution(false)
-  // };
-
   return (
-    <div className={`relative flex items-center justify-center min-h-screen  p-4 bg-sky-200`}>
+    <div className={`relative flex items-center justify-center min-h-screen p-4 bg-sky-200`}>
       {showCelebration && <Confetti numberOfPieces={confettiPieces} gravity={0.3} />}
 
       <motion.div
@@ -170,52 +197,36 @@ const QuizQuestion = () => {
                           : "bg-pink-100 border-pink-300 text-pink-700"
                         : " border-gray-200 hover:border-pink-300"
                     }
-                    ${option === correctAnswer ? "border-green-500 bg-green-200 text-green-800" : ""}`}
+                    ${ isSubmitted ? option.is_correct ? "border-green-500 bg-green-200 text-green-800" : "" : ""}`}
                   disabled={isSubmitted}
                 >
                   {option.description}
-                  {selected === option && isCorrect !== null && (
+                  {isSubmitted  && selected === option && isCorrect !== null && (
                     <motion.span initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3 }}>
-                      {isCorrect ? "" : "❌"}
+                      {isCorrect ? "✔️" : "❌"}
                     </motion.span>
                   )}
-                  {option === correctAnswer && isSubmitted && <span className="ml-2">✔️</span>}
+                  {option.is_correct && isSubmitted && !isCorrect && <span className="ml-2">✔️</span>}
                 </motion.button>
               ))}
             </div>
           </motion.div>
 
           {isCorrect === null ? (
-            <motion.button
-              onClick={handleSubmit}
-              disabled={!selected}
-              className={`mx-auto block px-8 py-2 rounded-full text-sm font-medium transition-all
-                ${selected ? "bg-sky-200 text-sky-800 cursor-pointer" : "bg-gray-100 text-gray-400 cursor-not-allowed"}`}
-            >
+            <motion.button onClick={handleSubmit} disabled={!selected} className="mx-auto block px-8 py-2 rounded-full bg-sky-200 text-sky-800">
               Submit
             </motion.button>
           ) : (
             <div className="flex justify-center gap-4 mt-6">
-              <motion.button onClick={handleViewSolution} className="px-6 py-2 bg-gray-500 text-white rounded-lg shadow-md hover:bg-gray-600">
+              <motion.button onClick={handleViewSolution} className="px-6 py-2 bg-gray-500 text-white rounded-lg">
                 {showSolution ? "Hide Solution" : "View Solution"}
               </motion.button>
-              <motion.button onClick={handleNextQuestion} className="px-6 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600">
+              <motion.button onClick={handleNextQuestion} className="px-6 py-2 bg-blue-500 text-white rounded-lg">
                 Next Question
               </motion.button>
             </div>
           )}
-
           {showSolution && <div className="mt-6 p-4 bg-gray-100 rounded-lg border border-gray-300">{cleanText(currentQuestion.solution)}</div>}
-          {/* {showMaterial && (
-            <div className="mt-6 p-4 bg-gray-100 rounded-lg border border-gray-300">
-              {currentQuestion.content.map((htmlString, index) => {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(htmlString, "text/html");
-                return <p key={index}>{doc.body.textContent}</p>;
-              })}
-            </div>
-          )} */}
-
         </motion.div>
       </motion.div>
     </div>
