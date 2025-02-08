@@ -80,21 +80,23 @@ const IntroCard = () => {
             </p>
           </motion.div>
 
-          {/* More Horizontal and Curved Line on the Left */}
+          {/* Animated Curved Line on the Left */}
           <motion.div
             animate={{ scale: 1, x: [0, -10, 0], y: [0, -10, 10, 0] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute -left-12 bottom-8 w-42 h-10 border-l-[10px] border-b-[10px] border-pink-400 rounded-bl-full rotate-[-10deg]"
+            className="absolute -left-12 bottom-12 w-36 h-10 border-l-[8px] border-b-[8px] border-pink-400 rounded-bl-full rotate-[-10deg]"
           />
 
+          {/* Centered Start Button */}
           <motion.button
-            animate={{ scale: 1, y: [0, -10, 0] }}
-            whileHover={{ scale: 1.2 }}
+            animate={{ scale: 1,  y: [0, -10, 10, 0]}}
+            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+            whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            className="absolute -right-8 bottom-8 w-14 h-14 bg-pink-500 rounded-full flex items-center justify-center cursor-pointer shadow-lg hover:bg-pink-600 transition-all"
+            className="mx-auto mt-8 block bg-pink-500 text-white px-6 py-3 rounded-lg text-lg font-semibold shadow-md hover:bg-pink-600 transition-all"
             onClick={handleStartQuiz}
           >
-            <span className="text-white font-bold text-2xl">→</span>
+            Start Quiz
           </motion.button>
         </motion.div>
       </div>
