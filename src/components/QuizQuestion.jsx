@@ -14,9 +14,9 @@ const QuizQuestion = () => {
   const nav = useNavigate();
 
   const [lifeLoss, setLifeLoss] = useState(false);
-  const [timer, setTimer] = useState(15); // 10-second timer
-  const [timerRunning, setTimerRunning] = useState(true); // Track if timer is active
-  const [bonusLife, setBonusLife] = useState(false); // Animation for bonus life
+  const [timer, setTimer] = useState(15); 
+  const [timerRunning, setTimerRunning] = useState(true); 
+  const [bonusLife, setBonusLife] = useState(false); 
   const [selected, setSelected] = useState(null);
   const [showCelebration, setShowCelebration] = useState(false);
   const [confettiPieces, setConfettiPieces] = useState(150);
@@ -27,17 +27,18 @@ const QuizQuestion = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [correctAnswer, setCorrectAnswer] = useState(null);
 
+  // This is for the timer logic
   useEffect(() => {
     const questionKey = `question-${currentQuestionIndex}`;
     const storedStartTime = localStorage.getItem(questionKey);
     const now = Date.now();
-    let timeLeft = 10; // Default timer value
+    let timeLeft = 10; 
   
     if (storedStartTime) {
       const elapsedTime = Math.floor((now - parseInt(storedStartTime)) / 1000);
-      timeLeft = Math.max(10 - elapsedTime, 0); // Prevent negative values
+      timeLeft = Math.max(10 - elapsedTime, 0); 
     } else {
-      localStorage.setItem(questionKey, now); // Store time if not present
+      localStorage.setItem(questionKey, now); 
     }
   
     setTimer(timeLeft);
@@ -60,17 +61,18 @@ const QuizQuestion = () => {
     }, 1000);
   
     return () => clearInterval(countdown);
-  }, [currentQuestionIndex]); // Runs when a new question is loaded
+  }, [currentQuestionIndex]); 
    
-  
+  // Navigate to failure if all the lives are lost
   useEffect(() => {
     setTimeout(() => {
       if (lives <= 0) {
-        nav('/failure'); // Ensure you have a failure page created
+        nav('/failure'); 
       }
     }, 800);
   }, [lives, nav]);
 
+  // Show the confetti celebration when the user submits correct answer
   useEffect(() => {
     let fadeOutInterval;
     if (showCelebration) {
@@ -102,6 +104,7 @@ const QuizQuestion = () => {
     return <div className="flex items-center justify-center min-h-screen bg-sky-200 text-2xl">No questions available</div>;
   }
 
+  // If all the questions are answered by the user re-direct the user to the results page
   if (currentQuestionIndex >= questions.length) {
     nav('/results');
     return;
@@ -110,6 +113,7 @@ const QuizQuestion = () => {
 
   const currentQuestion = questions[currentQuestionIndex];
 
+  // Prevent users progress if the user refreshes the web site
   useEffect(() => {
     const storedData = localStorage.getItem(`submitted-${currentQuestionIndex}`);
   
@@ -126,7 +130,6 @@ const QuizQuestion = () => {
         console.error("Error parsing stored submission:", error);
       }
     } else {
-      // Reset state if there's no stored submission
       setSelected(null);
       setIsSubmitted(false);
       setCorrectAnswer(null);
@@ -134,6 +137,7 @@ const QuizQuestion = () => {
     }
   }, [currentQuestionIndex, questions]);   
   
+  // When the user clicks on the submit button
   const handleSubmit = () => {
     if (selected !== null && !isSubmitted) {
       const isAnswerCorrect = selected.is_correct;
@@ -147,9 +151,9 @@ const QuizQuestion = () => {
         setShowCelebration(true);
         console.log(timerRunning)
         if (timerRunning == true) {
-          dispatch(addLive()); // Increase life
-          setBonusLife(true); // Trigger animation
-          setTimeout(() => setBonusLife(false), 2000); // Reset animation
+          dispatch(addLive());
+          setBonusLife(true);
+          setTimeout(() => setBonusLife(false), 2000); 
         }
 
       } else {
@@ -163,7 +167,6 @@ const QuizQuestion = () => {
       const correctOpt = currentQuestion.options.find((opt) => opt.is_correct);
       setCorrectAnswer(correctOpt);
   
-      // Store submission in localStorage
       const selectedIndex = currentQuestion.options.findIndex(opt => opt.description === selected.description);
       localStorage.setItem(
         `submitted-${currentQuestionIndex}`,
@@ -172,6 +175,7 @@ const QuizQuestion = () => {
     }
   };
 
+  // When the user clicks on the next question button
   const handleNextQuestion = () => {
     setIsCorrect(null);
     setShowCelebration(false);
@@ -184,14 +188,17 @@ const QuizQuestion = () => {
     dispatch(nextQuestion());
   };
 
+  // When the user clicks on the view solution button
   const handleViewSolution = () => {
     setShowSolution((prev) => !prev);
   };
 
+  // To remove the '*' from the solution text which is fetched from the API
   const cleanText = (text) => text.replace(/\*/g, ''); 
 
   return (
     <div className={`relative flex items-center justify-center min-h-screen p-4 bg-sky-200`}>
+      {/* Confetti celebration */}
       {showCelebration && <Confetti numberOfPieces={confettiPieces} gravity={0.3} />}
 
       <motion.div
@@ -218,7 +225,7 @@ const QuizQuestion = () => {
           transition={{ duration: 0.3 }}
         >
           <div className="absolute top-4 right-8 flex items-center space-x-4">
-            {/* Timer UI */}
+            {/* Timer */}
             { !isSubmitted && timerRunning && (<motion.div 
               className={`px-4 py-2 rounded-md text-white font-semibold ${timerRunning ? "bg-blue-500" : "bg-gray-500"}`}
               animate={{ scale: timerRunning ? [1, 1.2, 1] : 1 }}
@@ -227,7 +234,7 @@ const QuizQuestion = () => {
               ⏳ {timer}s
             </motion.div>)}
 
-            {/* Bonus Life Animation */}
+            {/* Additional live if submitted correct answer in time */}
             {showCelebration && bonusLife && (
               <motion.div 
                 className="bg-green-400 px-6 py-2 rounded text-sm font-medium text-white"
@@ -239,6 +246,7 @@ const QuizQuestion = () => {
             )}
           </div>
 
+          {/* Total lives count */}
           <motion.div 
             className="absolute -top-4 left-8 bg-red-400 px-6 py-2 rounded text-sm font-medium text-white"
             animate={{ scale: lifeLoss ? [1, 1.2, 1] : 1, opacity: lifeLoss ? [1, 0.5, 1] : 1 }}
@@ -247,11 +255,12 @@ const QuizQuestion = () => {
             ❤️ Lives: {lives}
           </motion.div>
 
-
+          {/* Displaying the count of question and the users score */}
           <motion.div className="absolute -top-4 right-8 bg-yellow-300 px-6 py-2 rounded text-sm font-medium">
             QUESTION {currentQuestionIndex + 1}/{questions.length} | Score: {score}
           </motion.div>
 
+          {/* When correct answer is submitted */}
           {showCelebration && (
             <motion.div
               initial={{ scale: 0 }}
@@ -263,11 +272,13 @@ const QuizQuestion = () => {
             </motion.div>
           )}
 
+          {/* Displaying the question */}
           <motion.div className="mt-6 text-center mb-8">
             <h2 className="text-2xl font-medium mb-8" style={{ fontFamily: "Comic Sans MS, cursive" }}>
               {currentQuestion.question}
             </h2>
 
+            {/* Displaying the options for the current question */}
             <div className="grid gap-4">
               {currentQuestion.options.map((option, index) => (
                 <motion.button
@@ -298,6 +309,7 @@ const QuizQuestion = () => {
             </div>
           </motion.div>
 
+          {/* Show different options like submit, next question and view solution based on the users submission */}
           {isCorrect === null ? (
             <motion.button onClick={handleSubmit} disabled={!selected} className="mx-auto block px-8 py-2 rounded-full bg-sky-200 text-sky-800">
               Submit
@@ -312,6 +324,8 @@ const QuizQuestion = () => {
               </motion.button>
             </div>
           )}
+
+          {/* Show the solution when the user clicks on the view solution button */}
           {showSolution && !showCelebration && <div className="mt-6 p-4 bg-gray-100 rounded-lg border border-gray-300">{cleanText(currentQuestion.solution)}</div>}
         </motion.div>
       </motion.div>

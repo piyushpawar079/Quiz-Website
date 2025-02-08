@@ -125,8 +125,8 @@ const QuizResults = () => {
         <button
           className="px-6 py-2 bg-indigo-500 text-white rounded-lg shadow-md hover:bg-indigo-600"
           onClick={() => {
-            dispatch(resetQuiz()); // Clear local storage
-            navigate("/"); // Navigate to home
+            dispatch(resetQuiz());
+            navigate("/"); 
           }}
         >
           Home
