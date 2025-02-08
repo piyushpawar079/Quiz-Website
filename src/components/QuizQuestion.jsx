@@ -1,19 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
-import { submitAnswer, nextQuestion } from "../store/QuizSlice.js";
+import { submitAnswer, nextQuestion, addLive } from "../store/QuizSlice.js";
 import Confetti from "react-confetti";
 import { useNavigate } from "react-router-dom";
-import { GiConsoleController } from "react-icons/gi";
 
 const QuizQuestion = () => {
   const dispatch = useDispatch();
-  const { questions, currentQuestionIndex, loading, score } = useSelector(
+  const { questions, currentQuestionIndex, loading, score, lives } = useSelector(
     (state) => state.quiz
   );
 
   const nav = useNavigate();
 
+  const [lifeLoss, setLifeLoss] = useState(false);
+  const [timer, setTimer] = useState(10); // 10-second timer
+  const [timerRunning, setTimerRunning] = useState(true); // Track if timer is active
+  const [bonusLife, setBonusLife] = useState(false); // Animation for bonus life
   const [selected, setSelected] = useState(null);
   const [showCelebration, setShowCelebration] = useState(false);
   const [confettiPieces, setConfettiPieces] = useState(150);
@@ -22,7 +25,33 @@ const QuizQuestion = () => {
   const [backgroundGlow, setBackgroundGlow] = useState(false);
   const [cardShake, setCardShake] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [correctAnswer, setCorrectAnswer] = useState(null); 
+  const [correctAnswer, setCorrectAnswer] = useState(null);
+
+  useEffect(() => {
+    setTimer(10); // Reset timer for each question
+    setTimerRunning(true); 
+  
+    const countdown = setInterval(() => {
+      setTimer((prev) => {
+        if (prev <= 1) {
+          clearInterval(countdown);
+          setTimerRunning(false); // Stop timer
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  
+    return () => clearInterval(countdown); // Cleanup
+  }, [currentQuestionIndex]); // Restart timer for every new question  
+  
+  useEffect(() => {
+    setTimeout(() => {
+      if (lives <= 0) {
+        nav('/failure'); // Ensure you have a failure page created
+      }
+    }, 800);
+  }, [lives, nav]);
 
   useEffect(() => {
     let fadeOutInterval;
@@ -70,7 +99,6 @@ const QuizQuestion = () => {
       try {
         const parsedData = JSON.parse(storedData);
         if (parsedData) {
-          console.log("parsedData", parsedData)
           setSelected(currentQuestion.options[parsedData.selectedIndex]);
           setIsSubmitted(parsedData.submitted);
           setCorrectAnswer(parsedData.correctAnswer);
@@ -99,10 +127,21 @@ const QuizQuestion = () => {
   
       if (isAnswerCorrect) {
         setShowCelebration(true);
+        console.log(timerRunning)
+        if (timerRunning == true) {
+          dispatch(addLive()); // Increase life
+          setBonusLife(true); // Trigger animation
+          setTimeout(() => setBonusLife(false), 2000); // Reset animation
+        }
+
       } else {
         setCardShake(true);
+        setLifeLoss(true);
+        setTimeout(() => setLifeLoss(false), 500);
       }
   
+      setTimerRunning(false); 
+
       const correctOpt = currentQuestion.options.find((opt) => opt.is_correct);
       setCorrectAnswer(correctOpt);
   
@@ -114,8 +153,6 @@ const QuizQuestion = () => {
       );
     }
   };
-  
-  console.log(selected, correctAnswer, isSubmitted)
 
   const handleNextQuestion = () => {
     setIsCorrect(null);
@@ -162,6 +199,37 @@ const QuizQuestion = () => {
           }}
           transition={{ duration: 0.3 }}
         >
+          <div className="absolute top-4 right-8 flex items-center space-x-4">
+            {/* Timer UI */}
+            { !isSubmitted && (<motion.div 
+              className={`px-4 py-2 rounded-md text-white font-semibold ${timerRunning ? "bg-blue-500" : "bg-gray-500"}`}
+              animate={{ scale: timerRunning ? [1, 1.2, 1] : 1 }}
+              transition={{ duration: 0.5, repeat: Infinity }}
+            >
+              ⏳ {timer}s
+            </motion.div>)}
+
+            {/* Bonus Life Animation */}
+            {showCelebration && bonusLife && (
+              <motion.div 
+                className="bg-green-400 px-6 py-2 rounded text-sm font-medium text-white"
+                animate={{ scale: [1, 1.3, 1], opacity: [1, 0.5, 1] }}
+                transition={{ duration: 0.5 }}
+              >
+                +1 ❤️
+              </motion.div>
+            )}
+          </div>
+
+          <motion.div 
+            className="absolute -top-4 left-8 bg-red-400 px-6 py-2 rounded text-sm font-medium text-white"
+            animate={{ scale: lifeLoss ? [1, 1.2, 1] : 1, opacity: lifeLoss ? [1, 0.5, 1] : 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            ❤️ Lives: {lives}
+          </motion.div>
+
+
           <motion.div className="absolute -top-4 right-8 bg-yellow-300 px-6 py-2 rounded text-sm font-medium">
             QUESTION {currentQuestionIndex + 1}/{questions.length} | Score: {score}
           </motion.div>

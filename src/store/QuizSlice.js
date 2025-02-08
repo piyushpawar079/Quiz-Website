@@ -54,6 +54,7 @@ const quizSlice = createSlice({
     score: 0,
     loading: false,
     error: null,
+    lives: 3,
   },
   reducers: {
     submitAnswer: (state, action) => {
@@ -65,6 +66,7 @@ const quizSlice = createSlice({
         state.isCorrect = true;
       } else {
         state.score -= 1;
+        state.lives -= 1;
         state.isCorrect = false;
       }
       saveState(state); // Save updated state to localStorage
@@ -77,11 +79,16 @@ const quizSlice = createSlice({
       state.currentQuestionIndex += 1;
       saveState(state);
     },
+    addLive: (state) => {
+      state.lives += 1;
+      saveState(state);
+    },
     resetQuiz: (state) => {
       state.currentQuestionIndex = 0;
       state.score = 0;
       state.userAnswers = [];
       state.isCorrect = null;
+      state.lives = 3;
       saveState(state);
     },
   },
@@ -104,5 +111,5 @@ const quizSlice = createSlice({
   },
 });
 
-export const { submitAnswer, resetQuiz, nextQuestion, setCurrentQuestionIndex } = quizSlice.actions;
+export const { submitAnswer, resetQuiz, nextQuestion, setCurrentQuestionIndex, addLive } = quizSlice.actions;
 export default quizSlice.reducer;
