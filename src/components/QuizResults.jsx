@@ -43,11 +43,11 @@ const QuizResults = () => {
                   {index + 1}. {question.question}
                 </h3>
                 <button
-                  className="px-4 py-1 bg-indigo-500 text-white rounded-lg shadow-md hover:bg-indigo-600 flex items-center gap-2"
-                  onClick={() => toggleDetails(index)}
+                className="px-2 py-2 w-[140px] bg-indigo-500 text-white rounded-lg shadow-md hover:bg-indigo-600 flex items-center justify-center gap-2"
+                onClick={() => toggleDetails(index)}
                 >
-                  {isOpen ? "Close" : "View Details"}
-                  {isOpen ? <FiChevronUp /> : <FiChevronDown />}
+                <span className="whitespace-nowrap">{isOpen ? "Close" : "View Details"}</span>
+                {isOpen ? <FiChevronUp /> : <FiChevronDown />}
                 </button>
               </div>
 
@@ -56,7 +56,7 @@ const QuizResults = () => {
                 <p className="text-md">
                   <strong>Your Answer:</strong>{" "}
                   <span
-                    className={`px-2 py-1 rounded-md ${
+                    className={`px-1 rounded-md ${
                       userAnswer?.is_correct ? "bg-green-200 text-green-700" : "bg-red-200 text-red-700"
                     }`}
                   >
@@ -65,7 +65,7 @@ const QuizResults = () => {
                 </p>
                 <p className="text-md mt-1">
                   <strong>Correct Answer:</strong>{" "}
-                  <span className="px-2 py-1 bg-green-200 text-green-700 rounded-md">
+                  <span className="px-1  bg-green-200 text-green-700 rounded-md">
                     {correctOption.description}
                   </span>
                 </p>
