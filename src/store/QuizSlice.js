@@ -28,6 +28,8 @@ const quizSlice = createSlice({
     currentQuestionIndex: 0,
     userAnswers: [],
     isCorrect: null,
+    title: null,
+    topic: null,
     score: 0,
     loading: false,
     error: null,
@@ -59,8 +61,10 @@ const quizSlice = createSlice({
         state.loading = true;
       })
       .addCase(fetchQuestions.fulfilled, (state, action) => {
-        state.loading = false;
+        state.topic = action.payload[0].topic;
+        state.title = action.payload[0].title;
         state.questions = action.payload;
+        state.loading = false;
       })
       .addCase(fetchQuestions.rejected, (state, action) => {
         state.loading = false;

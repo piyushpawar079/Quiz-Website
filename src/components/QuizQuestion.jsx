@@ -97,14 +97,16 @@ const QuizQuestion = () => {
   };
 
   const handleViewSolution = () => {
-    setShowSolution(true);
+    setShowSolution((prev) => (prev = !prev));
     setShowMaterial(false)
   };
 
-  const handleViewMaterial = () => {
-    setShowMaterial(true)
-    setShowSolution(false)
-  };
+  const cleanText = (text) => text.replace(/\*/g, ''); 
+
+  // const handleViewMaterial = () => {
+  //   setShowMaterial(true)
+  //   setShowSolution(false)
+  // };
 
   return (
     <div className={`relative flex items-center justify-center min-h-screen  p-4 bg-sky-200`}>
@@ -195,10 +197,7 @@ const QuizQuestion = () => {
           ) : (
             <div className="flex justify-center gap-4 mt-6">
               <motion.button onClick={handleViewSolution} className="px-6 py-2 bg-gray-500 text-white rounded-lg shadow-md hover:bg-gray-600">
-                View Solution
-              </motion.button>
-              <motion.button onClick={handleViewMaterial} className="px-6 py-2 bg-gray-500 text-white rounded-lg shadow-md hover:bg-gray-600">
-                View Reading Material
+                {showSolution ? "Hide Solution" : "View Solution"}
               </motion.button>
               <motion.button onClick={handleNextQuestion} className="px-6 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600">
                 Next Question
@@ -206,8 +205,8 @@ const QuizQuestion = () => {
             </div>
           )}
 
-          {showSolution && <div className="mt-6 p-4 bg-gray-100 rounded-lg border border-gray-300">{currentQuestion.solution}</div>}
-          {showMaterial && (
+          {showSolution && <div className="mt-6 p-4 bg-gray-100 rounded-lg border border-gray-300">{cleanText(currentQuestion.solution)}</div>}
+          {/* {showMaterial && (
             <div className="mt-6 p-4 bg-gray-100 rounded-lg border border-gray-300">
               {currentQuestion.content.map((htmlString, index) => {
                 const parser = new DOMParser();
@@ -215,7 +214,7 @@ const QuizQuestion = () => {
                 return <p key={index}>{doc.body.textContent}</p>;
               })}
             </div>
-          )}
+          )} */}
 
         </motion.div>
       </motion.div>

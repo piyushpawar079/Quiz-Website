@@ -20,6 +20,8 @@ const QuizResults = () => {
     }));
   };
 
+  const cleanText = (text) => text.replace(/\*/g, ''); 
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-500 to-yellow-200 flex flex-col items-center p-6 text-white">
       {/* Score Section */}
@@ -83,7 +85,7 @@ const QuizResults = () => {
                     {expandedSections[index]?.solution ? <FiChevronUp /> : <FiChevronDown />}
                   </button>
                   {expandedSections[index]?.solution && (
-                    <p className="mt-3 text-gray-800 p-3 bg-gray-200 rounded-md">{question.solution}</p>
+                    <p className="mt-3 text-gray-800 p-3 bg-gray-200 rounded-md">{cleanText(question.solution)}</p>
                   )}
 
                   {/* Toggle Reading Material */}
