@@ -71,7 +71,7 @@ This is an interactive quiz application built using React, Redux, and Framer Mot
 ## Screenshots
 
 ### Home Page
-![Home Page](screenshots/home_page.png)
+![Home Page](screenshots/Home_Page.png)
 
 ### Quiz Screen
 ![Quiz Screen](screenshots/Quiz_Question.png)
