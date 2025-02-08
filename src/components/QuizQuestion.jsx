@@ -14,7 +14,7 @@ const QuizQuestion = () => {
   const nav = useNavigate();
 
   const [lifeLoss, setLifeLoss] = useState(false);
-  const [timer, setTimer] = useState(10); // 10-second timer
+  const [timer, setTimer] = useState(15); // 10-second timer
   const [timerRunning, setTimerRunning] = useState(true); // Track if timer is active
   const [bonusLife, setBonusLife] = useState(false); // Animation for bonus life
   const [selected, setSelected] = useState(null);
@@ -28,22 +28,40 @@ const QuizQuestion = () => {
   const [correctAnswer, setCorrectAnswer] = useState(null);
 
   useEffect(() => {
-    setTimer(10); // Reset timer for each question
-    setTimerRunning(true); 
+    const questionKey = `question-${currentQuestionIndex}`;
+    const storedStartTime = localStorage.getItem(questionKey);
+    const now = Date.now();
+    let timeLeft = 10; // Default timer value
+  
+    if (storedStartTime) {
+      const elapsedTime = Math.floor((now - parseInt(storedStartTime)) / 1000);
+      timeLeft = Math.max(10 - elapsedTime, 0); // Prevent negative values
+    } else {
+      localStorage.setItem(questionKey, now); // Store time if not present
+    }
+  
+    setTimer(timeLeft);
+    setTimerRunning(true);
+  
+    if (timeLeft === 0) {
+      setTimerRunning(false);
+      return;
+    }
   
     const countdown = setInterval(() => {
       setTimer((prev) => {
         if (prev <= 1) {
           clearInterval(countdown);
-          setTimerRunning(false); // Stop timer
+          setTimerRunning(false);
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
   
-    return () => clearInterval(countdown); // Cleanup
-  }, [currentQuestionIndex]); // Restart timer for every new question  
+    return () => clearInterval(countdown);
+  }, [currentQuestionIndex]); // Runs when a new question is loaded
+   
   
   useEffect(() => {
     setTimeout(() => {
@@ -201,7 +219,7 @@ const QuizQuestion = () => {
         >
           <div className="absolute top-4 right-8 flex items-center space-x-4">
             {/* Timer UI */}
-            { !isSubmitted && (<motion.div 
+            { !isSubmitted && timerRunning && (<motion.div 
               className={`px-4 py-2 rounded-md text-white font-semibold ${timerRunning ? "bg-blue-500" : "bg-gray-500"}`}
               animate={{ scale: timerRunning ? [1, 1.2, 1] : 1 }}
               transition={{ duration: 0.5, repeat: Infinity }}
@@ -286,7 +304,7 @@ const QuizQuestion = () => {
             </motion.button>
           ) : (
             <div className="flex justify-center gap-4 mt-6">
-              <motion.button onClick={handleViewSolution} className="px-6 py-2 bg-gray-500 text-white rounded-lg">
+              <motion.button disabled={showCelebration} onClick={handleViewSolution} className="px-6 py-2 bg-gray-500 text-white rounded-lg">
                 {showSolution ? "Hide Solution" : "View Solution"}
               </motion.button>
               <motion.button onClick={handleNextQuestion} className="px-6 py-2 bg-blue-500 text-white rounded-lg">
@@ -294,7 +312,7 @@ const QuizQuestion = () => {
               </motion.button>
             </div>
           )}
-          {showSolution && <div className="mt-6 p-4 bg-gray-100 rounded-lg border border-gray-300">{cleanText(currentQuestion.solution)}</div>}
+          {showSolution && !showCelebration && <div className="mt-6 p-4 bg-gray-100 rounded-lg border border-gray-300">{cleanText(currentQuestion.solution)}</div>}
         </motion.div>
       </motion.div>
     </div>

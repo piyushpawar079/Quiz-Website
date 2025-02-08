@@ -1,21 +1,19 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
-import { fetchQuestions, resetQuiz, setCurrentQuestionIndex } from '../store/QuizSlice.js';
+import { fetchQuestions, resetQuiz } from '../store/QuizSlice.js';
 import { useNavigate } from 'react-router-dom';
 
 const IntroCard = () => {
   const dispatch = useDispatch();
   const nav = useNavigate();
-  const { title, topic, loading, currentQuestionIndex } = useSelector((state) => state.quiz);
+  const { title, topic, loading } = useSelector((state) => state.quiz);
 
   useEffect(() => {
     const storedTitle = localStorage.getItem('quizTitle');
     const storedTopic = localStorage.getItem('quizTopic');
-    
-    if (storedTitle && storedTopic) {
-      // dispatch(setQuizData({ title: storedTitle, topic: storedTopic }));
-    } else {
+
+    if (!(storedTitle && storedTopic)) {
       dispatch(fetchQuestions());
     }
   }, [dispatch]);
@@ -29,10 +27,9 @@ const IntroCard = () => {
 
   const handleStartQuiz = () => {
     localStorage.clear();
-    dispatch(resetQuiz());  // Reset in Redux
-    nav('/quiz'); 
+    dispatch(resetQuiz());
+    nav('/quiz');
   };
-  
 
   if (loading) {
     return <div className="flex items-center justify-center min-h-screen text-xl font-semibold">Loading...</div>;
@@ -41,10 +38,11 @@ const IntroCard = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-sky-200 p-4">
       <div className="relative w-[90%] md:w-[70%] max-w-4xl">
+        {/* Larger Stars */}
         <motion.div
           animate={{ scale: 1, rotate: [0, 10, -10, 0] }}
           transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute -left-16 -top-20 w-28 h-28 bg-yellow-400 rotate-12"
+          className="absolute -left-24 -top-24 w-40 h-40 bg-yellow-400 rotate-12"
           style={{
             clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)',
           }}
@@ -53,7 +51,7 @@ const IntroCard = () => {
         <motion.div
           animate={{ rotate: [0, 15, -15, 0], scale: [1, 1.1, 1] }}
           transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute -right-20 -top-12 w-28 h-28 bg-yellow-400 shadow-lg"
+          className="absolute -right-28 -top-16 w-40 h-40 bg-yellow-400 shadow-lg"
           style={{
             clipPath:
               'polygon(50% 0%, 60% 20%, 80% 20%, 65% 40%, 75% 60%, 50% 50%, 25% 60%, 35% 40%, 20% 20%, 40% 20%)',
@@ -82,10 +80,11 @@ const IntroCard = () => {
             </p>
           </motion.div>
 
+          {/* More Horizontal and Curved Line on the Left */}
           <motion.div
-            animate={{ scale: 1, y: [0, -10, 0] }}
+            animate={{ scale: 1, x: [0, -10, 0], y: [0, -10, 10, 0] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute -left-16 bottom-8 w-20 h-40 border-l-8 border-b-8 rounded-bl-full border-pink-400"
+            className="absolute -left-12 bottom-8 w-32 h-10 border-l-[10px] border-b-[10px] border-pink-400 rounded-bl-full rotate-[-20deg]"
           />
 
           <motion.button

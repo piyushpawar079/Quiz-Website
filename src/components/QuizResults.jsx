@@ -5,7 +5,7 @@ import { FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { resetQuiz } from "../store/QuizSlice";
 
 const QuizResults = () => {
-  const { questions, userAnswers, score } = useSelector((state) => state.quiz);
+  const { questions, userAnswers, score, lives } = useSelector((state) => state.quiz);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [openDetails, setOpenDetails] = useState({});
@@ -30,6 +30,12 @@ const QuizResults = () => {
       <div className="bg-white text-indigo-700 shadow-lg rounded-xl p-6 mb-6 text-center w-full max-w-xl">
         <h1 className="text-4xl font-bold">Quiz Results</h1>
         <p className="text-2xl font-semibold mt-2">Final Score: <span className="text-indigo-900">{score}</span></p>
+        <p className="text-2xl font-semibold mt-2">
+          Lives Remaining:{" "}
+          <span className={lives > 0 ? "text-green-600" : "text-red-600"}>
+            {lives > 0 ? "❤️".repeat(lives) : "❌ No lives left"}
+          </span>
+        </p>
       </div>
 
       {/* Questions & Answers */}
@@ -115,17 +121,17 @@ const QuizResults = () => {
       </div>
 
       {/* Navigation Buttons */}
-        <div className="mt-6 flex gap-4">
+      <div className="mt-6 flex gap-4">
         <button
-            className="px-6 py-2 bg-indigo-500 text-white rounded-lg shadow-md hover:bg-indigo-600"
-            onClick={() => {
-            dispatch(resetQuiz()) // Clear local storage
+          className="px-6 py-2 bg-indigo-500 text-white rounded-lg shadow-md hover:bg-indigo-600"
+          onClick={() => {
+            dispatch(resetQuiz()); // Clear local storage
             navigate("/"); // Navigate to home
-            }}
+          }}
         >
-            Home
+          Home
         </button>
-        </div>
+      </div>
     </div>
   );
 };
