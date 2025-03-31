@@ -66,7 +66,7 @@ const IntroCard = () => {
           style={{ borderLeft: '12px solid rgb(250, 204, 21)', borderBottom: '12px solid rgb(250, 204, 21)' }}
         >
           <motion.div
-            animate={{ y: 0, opacity: 1, y: [0, -10, 0] }}
+            animate={{opacity: 1, y: [0, -10, 0] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
             className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 px-8 py-2 rounded-lg text-lg font-semibold shadow-md"
           >
